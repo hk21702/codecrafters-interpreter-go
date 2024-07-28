@@ -5,6 +5,14 @@ import (
 	"os"
 )
 
+var runeNames map[rune]string
+
+func init() {
+	runeNames = make(map[rune]string)
+	runeNames['('] = "LEFT_PAREN"
+	runeNames[')'] = "RIGHT_PAREN"
+}
+
 func main() {
 	// You can use print statements as follows for debugging, they'll be visible when running tests.
 	fmt.Fprintln(os.Stderr, "Logs from your program will appear here!")
@@ -28,9 +36,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	if len(fileContents) > 0 {
-		panic("Scanner not implemented")
-	} else {
-		fmt.Println("EOF  null") // Placeholder, remove this line when implementing the scanner
+	strFileContents := string(fileContents)
+	for _, current := range strFileContents {
+		parseToken(current)
 	}
+
+	fmt.Println("EOF  null") // Placeholder, remove this line when implementing the scanner
+
+}
+
+func parseToken(ru rune) {
+	fmt.Printf("%s %c null\n", runeNames[ru], ru)
 }
