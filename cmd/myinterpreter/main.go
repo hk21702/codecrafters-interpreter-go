@@ -22,9 +22,6 @@ func init() {
 }
 
 func main() {
-	// You can use print statements as follows for debugging, they'll be visible when running tests.
-	fmt.Fprintln(os.Stderr, "Logs from your program will appear here!")
-
 	if len(os.Args) < 3 {
 		fmt.Fprintln(os.Stderr, "Usage: ./your_program.sh tokenize <filename>")
 		os.Exit(1)
@@ -46,13 +43,20 @@ func main() {
 
 	strFileContents := string(fileContents)
 	for _, current := range strFileContents {
-		parseToken(current)
+		parseToken(current, 1)
 	}
 
 	fmt.Println("EOF  null") // Placeholder, remove this line when implementing the scanner
 
 }
 
-func parseToken(ru rune) {
-	fmt.Printf("%s %c null\n", runeNames[ru], ru)
+func parseToken(ru rune, lineNum int) {
+	runeName, exists := runeNames[ru]
+
+	if exists {
+		fmt.Printf("%s %c null\n", runeName, ru)
+	} else {
+		// Unrecognized rune
+		fmt.Printf("[line %d] Error: Unexpected character: %c\n", lineNum, ru)
+	}
 }
