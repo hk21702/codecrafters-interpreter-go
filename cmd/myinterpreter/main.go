@@ -6,8 +6,11 @@ import (
 )
 
 var runeNames map[rune]string
+var exitCode int
 
 func init() {
+	exitCode = 0
+
 	runeNames = make(map[rune]string)
 	runeNames['('] = "LEFT_PAREN"
 	runeNames[')'] = "RIGHT_PAREN"
@@ -48,6 +51,7 @@ func main() {
 
 	fmt.Println("EOF  null") // Placeholder, remove this line when implementing the scanner
 
+	os.Exit(exitCode)
 }
 
 func parseToken(ru rune, lineNum int) {
@@ -58,5 +62,6 @@ func parseToken(ru rune, lineNum int) {
 	} else {
 		// Unrecognized rune
 		fmt.Printf("[line %d] Error: Unexpected character: %c\n", lineNum, ru)
+		exitCode = 65
 	}
 }
