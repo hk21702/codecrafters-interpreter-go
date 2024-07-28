@@ -13,6 +13,10 @@ func init() {
 	runeNames[')'] = "RIGHT_PAREN"
 	runeNames['{'] = "LEFT_BRACE"
 	runeNames['}'] = "RIGHT_BRACE"
+	runeNames['*'] = "STAR"
+	runeNames['.'] = "DOT"
+	runeNames[','] = "COMMA"
+	runeNames['+'] = "PLUS"
 }
 
 func main() {
