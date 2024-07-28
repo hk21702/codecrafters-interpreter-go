@@ -17,6 +17,8 @@ func init() {
 	runeNames['.'] = "DOT"
 	runeNames[','] = "COMMA"
 	runeNames['+'] = "PLUS"
+	runeNames['-'] = "MINUS"
+	runeNames[';'] = "SEMICOLON"
 }
 
 func main() {
