@@ -61,7 +61,7 @@ func parseToken(ru rune, lineNum int) {
 		fmt.Printf("%s %c null\n", runeName, ru)
 	} else {
 		// Unrecognized rune
-		fmt.Printf("[line %d] Error: Unexpected character: %c\n", lineNum, ru)
+		fmt.Fprintf(os.Stderr, "[line %d] Error: Unexpected character: %c\n", lineNum, ru)
 		exitCode = 65
 	}
 }
