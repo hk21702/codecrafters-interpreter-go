@@ -11,6 +11,8 @@ func init() {
 	runeNames = make(map[rune]string)
 	runeNames['('] = "LEFT_PAREN"
 	runeNames[')'] = "RIGHT_PAREN"
+	runeNames['{'] = "LEFT_BRACE"
+	runeNames['}'] = "RIGHT_BRACE"
 }
 
 func main() {
