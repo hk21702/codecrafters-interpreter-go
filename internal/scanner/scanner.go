@@ -1,8 +1,8 @@
 package scanner
 
 import (
-	"fmt"
 	"errors"
+	"fmt"
 	"os"
 
 	"github.com/codecrafters-io/interpreter-starter-go/internal/lexer"
@@ -10,19 +10,26 @@ import (
 )
 
 // Scan the inputs
-func Scan(fileContents []byte) (exitCode int){
+func Scan(fileContents []byte) (exitCode int) {
 	lex := lexer.New(string(fileContents))
 
-	for tk, err := lex.ReadToken(); tk.Type != token.Eof; {
+	tk, err := lex.ReadToken()
+	for tk.Type != token.Eof {
 		if err != nil {
 			if errors.As(err, &lexer.UnexpectedChar{}) {
-				fmt.Fprintf(os.Stderr, err.Error())
+				fmt.Fprint(os.Stderr, err.Error())
 				exitCode = 65
 			}
+		} else {
+			parseToken(tk)
 		}
-	}
 
-	return 0
+		tk, err = lex.ReadToken()
+	}
+	// parse EOF
+	parseToken(tk)
+
+	return exitCode
 }
 
 // Parse the input
@@ -30,6 +37,6 @@ func parseToken(tk token.Token) {
 	if tk.Type != token.Eof {
 		fmt.Printf("%s %s null\n", tk.Type, tk.Literal)
 	} else {
-		fmt.Printf("%s null\n", tk.Type)
+		fmt.Printf("%s  null\n", tk.Type)
 	}
 }

@@ -10,48 +10,57 @@ import (
 
 func TestScan(t *testing.T) {
 	input1 := []byte(",.$(#")
-	expectedOutput1 := `[line 1] Error: Unexpected character: $
-[line 1] Error: Unexpected character: #
-COMMA , null
+	expectedStdOut1 := `COMMA , null
 DOT . null
 LEFT_PAREN ( null
-EOF  null`
+EOF  null
+`
+	expectedStdErr1 := `[line 1] Error: Unexpected character: $
+[line 1] Error: Unexpected character: #
+`
 
 	input2 := []byte("={===}")
-	expectedOutput2 := `EQUAL = null
+	expectedStdOut2 := `EQUAL = null
 LEFT_BRACE { null
 EQUAL_EQUAL == null
-EQUAL = null\n
+EQUAL = null
 RIGHT_BRACE } null
-EOF  null`
+EOF  null
+`
+	expectedStdErr2 := ""
 
-	output1 := captureScanOutput(input1)
-	compareOutput(t, expectedOutput1, output1.String())
+	output1, error1 := captureScanOutput(input1)
+	compareOutput(t, expectedStdOut1, output1.String())
+	compareOutput(t, expectedStdErr1, error1.String())
 
-	output2 := captureScanOutput(input2)
-	compareOutput(t, expectedOutput2, output2.String())
+	output2, error2 := captureScanOutput(input2)
+	compareOutput(t, expectedStdOut2, output2.String())
+	compareOutput(t, expectedStdErr2, error2.String())
 }
 
-func captureScanOutput(input []byte) (capturedOutput bytes.Buffer) {
+func captureScanOutput(input []byte) (capturedStdout, capturedStderr bytes.Buffer) {
 	oldStdout := os.Stdout
 	oldStderr := os.Stderr
-	r, w, _ := os.Pipe()
-	os.Stdout = w
-	os.Stderr = w
+	rOut, wOut, _ := os.Pipe()
+	rErr, wErr, _ := os.Pipe()
+	os.Stdout = wOut
+	os.Stderr = wErr
 
 	Scan(input)
 
-	w.Close()
+	wErr.Close()
+	wOut.Close()
 	os.Stdout = oldStdout
 	os.Stderr = oldStderr
 
-	io.Copy(&capturedOutput, r)
-	return capturedOutput
+	io.Copy(&capturedStdout, rOut)
+	io.Copy(&capturedStderr, rErr)
+	return capturedStdout, capturedStderr
 }
 
 func compareOutput(t *testing.T, expected, actual string) {
 	expectedLines := strings.Split(expected, "\n")
-	actualLines := strings.Split(expected, "\n")
+	actualLines := strings.Split(actual, "\n")
 
 	for i, expected_line := range expectedLines {
 		if expected_line != actualLines[i] {

@@ -33,6 +33,7 @@ func New(input string) *lexer {
 //	err - Error if there is one, nil otherwise.
 func (lex *lexer) ReadToken() (tk token.Token, err error) {
 	lex.skipWhiteSpace()
+	lex.nxtChar()
 	tk.Literal = string(lex.char)
 
 	// Check potential multi char tokens
@@ -69,7 +70,7 @@ func (lex *lexer) ReadToken() (tk token.Token, err error) {
 // If current position is already EOF, does nothing.
 // If the previous position was a new line control char, increments line.
 func (lex *lexer) nxtChar() {
-	if lex.position >= len(lex.input) {
+	if lex.nxtPosition >= len(lex.input) {
 		lex.char = 0
 		return
 	}
