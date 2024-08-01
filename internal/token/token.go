@@ -26,6 +26,7 @@ const (
 	GreaterEqual   TokenType = "GREATER_EQUAL"
 	String         TokenType = "STRING"
 	Slash          TokenType = "SLASH"
+	Number         TokenType = "NUMBER"
 )
 
 var RuneMap = map[byte]TokenType{
@@ -49,6 +50,6 @@ var RuneMap = map[byte]TokenType{
 
 type Token struct {
 	Type    TokenType
-	Lexeme string
+	Lexeme  string
 	Literal interface{}
 }

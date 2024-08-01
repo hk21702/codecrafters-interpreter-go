@@ -2,6 +2,8 @@ package lexer
 
 import (
 	"fmt"
+	"strconv"
+	"unicode"
 
 	"github.com/codecrafters-io/interpreter-starter-go/internal/token"
 )
@@ -40,34 +42,34 @@ func (lex *lexer) ReadToken() (tk token.Token, err error) {
 	switch lex.char {
 	case '/':
 		{
-			if lex.peekChar() == '/' {
+			if lex.peekChar(1) == '/' {
 				lex.nxtLine()
 				return lex.ReadToken()
 			}
 		}
 	case '=':
 		{
-			if lex.peekChar() == '=' {
+			if lex.peekChar(1) == '=' {
 				// Double equals
 				return lex.doubleToken(tk, token.EqualEqual)
 			}
 		}
 	case '!':
 		{
-			if lex.peekChar() == '=' {
+			if lex.peekChar(1) == '=' {
 				// !=
 				return lex.doubleToken(tk, token.BangEqual)
 			}
 		}
 	case '<':
 		{
-			if lex.peekChar() == '=' {
+			if lex.peekChar(1) == '=' {
 				return lex.doubleToken(tk, token.LessEqual)
 			}
 		}
 	case '>':
 		{
-			if lex.peekChar() == '=' {
+			if lex.peekChar(1) == '=' {
 				return lex.doubleToken(tk, token.GreaterEqual)
 			}
 		}
@@ -75,6 +77,10 @@ func (lex *lexer) ReadToken() (tk token.Token, err error) {
 		{
 			return lex.handleString()
 		}
+	}
+
+	if unicode.IsDigit(rune(lex.char)) {
+		return lex.handleNumber()
 	}
 
 	// Check reserved single char tokens
@@ -107,6 +113,40 @@ func (lex *lexer) handleString() (tk token.Token, err error) {
 
 	tk.Lexeme += string(lex.char)
 	tk.Literal = literal
+
+	return tk, nil
+}
+
+// Helper method to handle numbers
+func (lex *lexer) handleNumber() (tk token.Token, err error) {
+	tk.Type = token.Number
+	tk.Lexeme = string(lex.char)
+	dotCounts := 0
+	nxtChar := lex.peekChar(1)
+	for nxtChar == '.' || unicode.IsDigit(rune(nxtChar)) {
+		if unicode.IsSpace(rune(nxtChar)) || nxtChar == 0 {
+			break
+		}
+
+		if nxtChar == '.' {
+			if dotCounts >= 1 || !unicode.IsDigit(rune(lex.peekChar(2))) {
+				// Too many dots!
+				break
+			}
+
+			dotCounts++
+		}
+		lex.nxtChar()
+		tk.Lexeme += string(lex.char)
+		nxtChar = lex.peekChar(1)
+	}
+
+	if lex.peekChar(1) == '.' && (unicode.IsSpace(rune(lex.peekChar(2))) || lex.peekChar(2) == 0) {
+		// Number is float
+		tk.Literal, _ = strconv.ParseFloat(tk.Lexeme+".0", 64)
+	} else {
+		tk.Literal, _ = strconv.ParseFloat(tk.Lexeme, 64)
+	}
 
 	return tk, nil
 }
@@ -147,12 +187,13 @@ func (lex *lexer) nxtChar() {
 
 // Peek at the next char/rune in the lexer
 // Does not move the position
-func (lex *lexer) peekChar() byte {
-	if lex.nxtPosition >= len(lex.input) {
+func (lex *lexer) peekChar(count int) byte {
+	pos := lex.position + count
+	if pos >= len(lex.input) {
 		return 0
 	}
 
-	return lex.input[lex.nxtPosition]
+	return lex.input[pos]
 }
 
 // Moves position until char is no longer whitespace
