@@ -49,5 +49,6 @@ var RuneMap = map[byte]TokenType{
 
 type Token struct {
 	Type    TokenType
-	Literal string
+	Lexeme string
+	Literal interface{}
 }

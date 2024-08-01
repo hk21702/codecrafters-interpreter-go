@@ -34,7 +34,7 @@ func New(input string) *lexer {
 func (lex *lexer) ReadToken() (tk token.Token, err error) {
 	lex.nxtChar()
 	lex.skipWhiteSpace()
-	tk.Literal = string(lex.char)
+	tk.Lexeme = string(lex.char)
 
 	// Check potential multi char tokens
 	switch lex.char {
@@ -42,7 +42,7 @@ func (lex *lexer) ReadToken() (tk token.Token, err error) {
 		{
 			if lex.peekChar() == '/' {
 				lex.nxtLine()
-				lex.ReadToken()
+				return lex.ReadToken()
 			}
 		}
 	case '=':
@@ -71,6 +71,10 @@ func (lex *lexer) ReadToken() (tk token.Token, err error) {
 				return lex.doubleToken(tk, token.GreaterEqual)
 			}
 		}
+	case '"':
+		{
+			return lex.handleString()
+		}
 	}
 
 	// Check reserved single char tokens
@@ -85,11 +89,33 @@ func (lex *lexer) ReadToken() (tk token.Token, err error) {
 	return tk, nil
 }
 
+// Helper method to handle strings
+func (lex *lexer) handleString() (tk token.Token, err error) {
+	tk.Type = token.String
+	tk.Lexeme = string(lex.char)
+	lex.nxtChar()
+	var literal string
+	for lex.char != '"' && lex.char != '\n' && lex.char != 0 {
+		literal += string(lex.char)
+		tk.Lexeme += string(lex.char)
+		lex.nxtChar()
+	}
+
+	if lex.char == '\n' || lex.char == 0 {
+		return tk, UnterminatedStr{Line: lex.line}
+	}
+
+	tk.Lexeme += string(lex.char)
+	tk.Literal = literal
+
+	return tk, nil
+}
+
 // Helper method to handle when the next token is a double rune/char token.
 func (lex *lexer) doubleToken(tk token.Token, tType token.TokenType) (token.Token, error) {
 	lex.nxtChar()
 	tk.Type = tType
-	tk.Literal += string(lex.char)
+	tk.Lexeme += string(lex.char)
 	return tk, nil
 }
 
@@ -135,6 +161,16 @@ func (lex *lexer) skipWhiteSpace() {
 	for lex.char == ' ' || lex.char == '\t' || lex.char == '\n' {
 		lex.nxtChar()
 	}
+}
+
+// Represents an error for when a string is unterminated
+type UnterminatedStr struct {
+	Line int
+}
+
+// Implements the Error interface for UnterminatedStr
+func (err UnterminatedStr) Error() string {
+	return fmt.Sprintf("[line %d] Error: Unterminated string.\n", err.Line)
 }
 
 // Represents an error for when the interpreter encounters an unexpected character in the input.

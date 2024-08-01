@@ -16,7 +16,7 @@ func Scan(fileContents []byte) (exitCode int) {
 	tk, err := lex.ReadToken()
 	for tk.Type != token.Eof {
 		if err != nil {
-			if errors.As(err, &lexer.UnexpectedChar{}) {
+			if errors.As(err, &lexer.UnexpectedChar{}) || errors.As(err, &lexer.UnterminatedStr{}) {
 				fmt.Fprint(os.Stderr, err.Error())
 				exitCode = 65
 			}
@@ -34,9 +34,16 @@ func Scan(fileContents []byte) (exitCode int) {
 
 // Parse the input
 func parseToken(tk token.Token) {
-	if tk.Type != token.Eof {
-		fmt.Printf("%s %s null\n", tk.Type, tk.Literal)
+	var literalStr string
+	if tk.Literal == nil {
+		literalStr = "null"
 	} else {
-		fmt.Printf("%s  null\n", tk.Type)
+		literalStr = fmt.Sprintf("%v", tk.Literal)
+	}
+
+	if tk.Type != token.Eof {
+		fmt.Printf("%s %s %v\n", tk.Type, tk.Lexeme, literalStr)
+	} else {
+		fmt.Printf("%s  %v\n", tk.Type, literalStr)
 	}
 }
