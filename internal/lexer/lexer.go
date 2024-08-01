@@ -141,7 +141,7 @@ func (lex *lexer) handleNumber() (tk token.Token, err error) {
 		nxtChar = lex.peekChar(1)
 	}
 
-	if lex.peekChar(1) == '.' && (unicode.IsSpace(rune(lex.peekChar(2))) || lex.peekChar(2) == 0) {
+	if lex.peekChar(1) == '.' && dotCounts == 0 {
 		// Number is float
 		tk.Literal, _ = strconv.ParseFloat(tk.Lexeme+".0", 64)
 	} else {

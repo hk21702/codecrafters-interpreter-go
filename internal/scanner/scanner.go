@@ -38,7 +38,22 @@ func parseToken(tk token.Token) {
 	if tk.Literal == nil {
 		literalStr = "null"
 	} else {
-		literalStr = fmt.Sprintf("%v", tk.Literal)
+		switch v := tk.Literal.(type) {
+		case float64:
+			if v == float64(int64(v)) {
+				literalStr = fmt.Sprintf("%.1f", v)
+			} else {
+				literalStr = fmt.Sprintf("%g", v)
+			}
+		case float32:
+			if v == float32(int32(v)) {
+				literalStr = fmt.Sprintf("%.1f", v)
+			} else {
+				literalStr = fmt.Sprintf("%g", v)
+			}
+		default:
+			literalStr = fmt.Sprintf("%v", tk.Literal)
+		}
 	}
 
 	if tk.Type != token.Eof {
