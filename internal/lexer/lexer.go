@@ -172,6 +172,11 @@ func (lex *lexer) handleIdentifier() (tk token.Token, err error) {
 		nextChar = lex.peekChar(1)
 	}
 
+	// Check for reserved keywords
+	if tkType, found := token.TokenMap[tk.Lexeme]; found {
+		tk.Type = tkType
+	}
+
 	return tk, nil
 }
 
