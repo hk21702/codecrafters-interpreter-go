@@ -42,23 +42,26 @@ func (lex *lexer) ReadToken() (tk token.Token, err error) {
 		{
 			if lex.peekChar() == '=' {
 				// Double equals
-
-				lex.nxtChar()
-
-				tk.Type = token.EqualEqual
-				tk.Literal += string(lex.char)
-
-				return tk, nil
+				return lex.doubleToken(tk, token.EqualEqual)
 			}
 		}
 	case '!':
 		{
 			if lex.peekChar() == '=' {
 				// !=
-				lex.nxtChar()
-				tk.Type = token.BangEqual
-				tk.Literal += string(lex.char)
-				return tk, nil
+				return lex.doubleToken(tk, token.BangEqual)
+			}
+		}
+	case '<':
+		{
+			if lex.peekChar() == '=' {
+				return lex.doubleToken(tk, token.LessEqual)
+			}
+		}
+	case '>':
+		{
+			if lex.peekChar() == '=' {
+				return lex.doubleToken(tk, token.GreaterEqual)
 			}
 		}
 	}
@@ -72,6 +75,14 @@ func (lex *lexer) ReadToken() (tk token.Token, err error) {
 	}
 
 	tk.Type = tokenT
+	return tk, nil
+}
+
+// Helper method to handle when the next token is a double rune/char token.
+func (lex *lexer) doubleToken(tk token.Token, tType token.TokenType) (token.Token, error) {
+	lex.nxtChar()
+	tk.Type = tType
+	tk.Literal += string(lex.char)
 	return tk, nil
 }
 

@@ -20,6 +20,10 @@ const (
 	EqualEqual     TokenType = "EQUAL_EQUAL"
 	Bang           TokenType = "BANG"
 	BangEqual      TokenType = "BANG_EQUAL"
+	Less           TokenType = "LESS"
+	LessEqual      TokenType = "LESS_EQUAL"
+	Greater        TokenType = "GREATER"
+	GreaterEqual   TokenType = "GREATER_EQUAL"
 )
 
 var RuneMap = map[byte]TokenType{
@@ -35,6 +39,8 @@ var RuneMap = map[byte]TokenType{
 	';': Semicolon,
 	'=': Equal,
 	'!': Bang,
+	'<': Less,
+	'>': Greater,
 	0:   Eof,
 }
 
