@@ -24,6 +24,7 @@ const (
 	LessEqual      TokenType = "LESS_EQUAL"
 	Greater        TokenType = "GREATER"
 	GreaterEqual   TokenType = "GREATER_EQUAL"
+	Slash TokenType = "SLASH"
 )
 
 var RuneMap = map[byte]TokenType{
@@ -41,6 +42,7 @@ var RuneMap = map[byte]TokenType{
 	'!': Bang,
 	'<': Less,
 	'>': Greater,
+	'/': Slash,
 	0:   Eof,
 }
 

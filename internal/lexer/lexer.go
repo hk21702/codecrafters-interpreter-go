@@ -38,6 +38,13 @@ func (lex *lexer) ReadToken() (tk token.Token, err error) {
 
 	// Check potential multi char tokens
 	switch lex.char {
+	case '/':
+		{
+			if lex.peekChar() == '/' {
+				lex.nxtLine()
+				lex.ReadToken()
+			}
+		}
 	case '=':
 		{
 			if lex.peekChar() == '=' {
@@ -84,6 +91,13 @@ func (lex *lexer) doubleToken(tk token.Token, tType token.TokenType) (token.Toke
 	tk.Type = tType
 	tk.Literal += string(lex.char)
 	return tk, nil
+}
+
+// Skip to the end of the line
+func (lex *lexer) nxtLine() {
+	for lex.char != '\n' && lex.char != 0 {
+		lex.nxtChar()
+	}
 }
 
 // Read the next char/rune in the lexer
