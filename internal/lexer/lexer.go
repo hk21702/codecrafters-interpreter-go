@@ -32,8 +32,8 @@ func New(input string) *lexer {
 //	token - The read token
 //	err - Error if there is one, nil otherwise.
 func (lex *lexer) ReadToken() (tk token.Token, err error) {
-	lex.skipWhiteSpace()
 	lex.nxtChar()
+	lex.skipWhiteSpace()
 	tk.Literal = string(lex.char)
 
 	// Check potential multi char tokens
