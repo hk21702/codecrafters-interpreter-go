@@ -86,8 +86,12 @@ func (lex *lexer) ReadToken() (tk token.Token, err error) {
 	// Check reserved single char tokens
 	tokenT, found := token.RuneMap[lex.char]
 	if !found {
-		tk.Type = token.UnexpectedChar
+		ru := rune(lex.char)
+		if unicode.IsLetter(ru) || unicode.IsNumber(ru) || ru == '_' {
+			return lex.handleIdentifier()
+		}
 
+		tk.Type = token.UnexpectedChar
 		return tk, UnexpectedChar{Char: lex.char, Line: lex.line}
 	}
 
@@ -146,6 +150,26 @@ func (lex *lexer) handleNumber() (tk token.Token, err error) {
 		tk.Literal, _ = strconv.ParseFloat(tk.Lexeme+".0", 64)
 	} else {
 		tk.Literal, _ = strconv.ParseFloat(tk.Lexeme, 64)
+	}
+
+	return tk, nil
+}
+
+// Helper method to handle identifiers
+func (lex *lexer) handleIdentifier() (tk token.Token, err error) {
+	tk.Type = token.Identifier
+	tk.Lexeme = string(lex.char)
+	nextChar := lex.peekChar(1)
+
+	for nextChar != 0 && !unicode.IsSpace(rune(nextChar)) {
+		// Check if its a reserved char
+		if _, found := token.RuneMap[nextChar]; found {
+			break
+		}
+
+		tk.Lexeme += string(nextChar)
+		lex.nxtChar()
+		nextChar = lex.peekChar(1)
 	}
 
 	return tk, nil

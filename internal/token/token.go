@@ -27,6 +27,7 @@ const (
 	String         TokenType = "STRING"
 	Slash          TokenType = "SLASH"
 	Number         TokenType = "NUMBER"
+	Identifier     TokenType = "IDENTIFIER"
 )
 
 var RuneMap = map[byte]TokenType{
