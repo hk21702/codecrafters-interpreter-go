@@ -51,6 +51,16 @@ func (lex *lexer) ReadToken() (tk token.Token, err error) {
 				return tk, nil
 			}
 		}
+	case '!':
+		{
+			if lex.peekChar() == '=' {
+				// !=
+				lex.nxtChar()
+				tk.Type = token.BangEqual
+				tk.Literal += string(lex.char)
+				return tk, nil
+			}
+		}
 	}
 
 	// Check reserved single char tokens

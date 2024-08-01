@@ -18,6 +18,8 @@ const (
 	Equal          TokenType = "EQUAL"
 	Eof            TokenType = "EOF"
 	EqualEqual     TokenType = "EQUAL_EQUAL"
+	Bang           TokenType = "BANG"
+	BangEqual      TokenType = "BANG_EQUAL"
 )
 
 var RuneMap = map[byte]TokenType{
@@ -32,6 +34,7 @@ var RuneMap = map[byte]TokenType{
 	'-': Minus,
 	';': Semicolon,
 	'=': Equal,
+	'!': Bang,
 	0:   Eof,
 }
 
