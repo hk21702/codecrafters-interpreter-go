@@ -46,7 +46,7 @@ func captureScanOutput(input []byte) (capturedStdout, capturedStderr bytes.Buffe
 	os.Stdout = wOut
 	os.Stderr = wErr
 
-	Scan(input)
+	Scan(input, true)
 
 	wErr.Close()
 	wOut.Close()

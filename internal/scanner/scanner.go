@@ -6,12 +6,14 @@ import (
 	"os"
 
 	"github.com/codecrafters-io/interpreter-starter-go/internal/lexer"
+	"github.com/codecrafters-io/interpreter-starter-go/internal/parser"
 	"github.com/codecrafters-io/interpreter-starter-go/internal/token"
 )
 
 // Scan the inputs
-func Scan(fileContents []byte) (exitCode int) {
+func Scan(fileContents []byte, print bool) (exitCode int) {
 	lex := lexer.New(string(fileContents))
+	var tokens []token.Token
 
 	tk, err := lex.ReadToken()
 	for tk.Type != token.Eof {
@@ -21,19 +23,30 @@ func Scan(fileContents []byte) (exitCode int) {
 				exitCode = 65
 			}
 		} else {
-			parseToken(tk)
+			if print {
+				printToken(tk)
+			}
+			tokens = append(tokens, tk)
 		}
 
 		tk, err = lex.ReadToken()
 	}
-	// parse EOF
-	parseToken(tk)
+	if print {
+		// parse EOF
+		printToken(tk)
+	}
+	tokens = append(tokens, tk)
+
+	par := parser.New(tokens)
+	output, _ := par.Parse()
+
+	fmt.Fprint(os.Stdout, output)
 
 	return exitCode
 }
 
 // Parse the input
-func parseToken(tk token.Token) {
+func printToken(tk token.Token) {
 	var literalStr string
 	if tk.Literal == nil {
 		literalStr = "null"
